@@ -2,6 +2,8 @@ package com.example.mapplication;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -19,6 +21,9 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.io.IOException;
+import java.util.List;
 
 public class MapsActivity extends FragmentActivity
         implements OnMapReadyCallback,
@@ -106,10 +111,36 @@ public class MapsActivity extends FragmentActivity
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISSION_FINE_LOCATION);
-            //Toast.makeText(this, "PERMISSION REFUSE !!!", Toast.LENGTH_LONG).show();
+            //Toast.makeText(this, "PERMISSION REFUSE !!!", Toast.LENGTH_LONG).show());
         }
         mMap.setOnMyLocationButtonClickListener(this);
         mMap.setOnMyLocationClickListener(this);
+
+        if (Geocoder.isPresent())
+        {
+            Toast.makeText(this, "Geocoder OK !!!", Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(this, "Geocoder NON !!!", Toast.LENGTH_LONG).show();
+        }
+
+        Geocoder geocoder = new Geocoder(this);
+        List<Address> addresses;
+
+        try {
+            addresses = geocoder.getFromLocationName("CCI Formation Colmar 68000", 1);
+            if(addresses.size() > 0) {
+                double latitude= addresses.get(0).getLatitude();
+                double longitude= addresses.get(0).getLongitude();
+
+                mMap.addMarker(new MarkerOptions()
+                        .position(new LatLng(latitude, longitude))
+                        .title("CCI Formation Colmar !")
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE)));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override
